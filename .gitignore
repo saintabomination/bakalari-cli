@@ -20,3 +20,5 @@ node_modules/
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+settings.mjs
