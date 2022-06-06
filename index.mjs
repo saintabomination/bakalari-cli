@@ -2,7 +2,23 @@ import puppeteer from 'puppeteer';
 
 import { url, username, password } from './settings.mjs';
 
-const dayNames = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek'];
+const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá'];
+
+const formatTable = dayData => {
+  let hourRow = '   ';
+  for (let i = 0; i < 11; i++) {
+    hourRow += String(i).padEnd(5, ' ');
+  }
+  console.log(hourRow);
+
+  dayData.forEach(
+    (day, index) => {
+      let row = `${dayNames[index]} `;
+      day.forEach(subject => row += `${subject} `);
+      console.log(row);
+    }
+  );
+}
 
 (async () => {
   const browser = await puppeteer.launch({
@@ -17,7 +33,7 @@ const dayNames = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek'];
   await page.goto(`${url}/next/rozvrh.aspx`);
 
   const getSubjects = await page.evaluate(() => {
-    const dayRows = document.querySelectorAll('#schedule .day-row'); // OK
+    const dayRows = document.querySelectorAll('#schedule .day-row');
     const subjects = [];
 
     dayRows.forEach(
@@ -29,8 +45,8 @@ const dayNames = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek'];
           element => {
             const subjectName = element.querySelector('.middle');
             subjectName
-              ? dayItems.push(subjectName.innerText)
-              : dayItems.push('Pauza');
+              ? dayItems.push(subjectName.innerText.padEnd(4, ' '))
+              : dayItems.push('    ');
           }
         );
 
@@ -41,13 +57,7 @@ const dayNames = ['Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek'];
     return subjects;
   });
 
-  getSubjects.forEach(
-    (day, index) => {
-      let row = `${dayNames[index]}: `;
-      day.forEach(subject => row += `${subject} `);
-      console.log(row);
-    }
-  );
+  formatTable(getSubjects);
 
   await browser.close();
 })();
