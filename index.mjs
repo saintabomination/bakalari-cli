@@ -4,17 +4,21 @@ import { url, username, password } from './settings.mjs';
 
 const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá'];
 
-const formatTable = dayData => {
+const formatTable = (dayData, maxSubjectNameLength) => {
   let hourRow = '   ';
   for (let i = 0; i < 11; i++) {
-    hourRow += String(i).padEnd(5, ' ');
+    hourRow += String(i).padEnd(maxSubjectNameLength + 1, ' ');
   }
   console.log(hourRow);
 
   dayData.forEach(
     (day, index) => {
       let row = `${dayNames[index]} `;
-      day.forEach(subject => row += `${subject} `);
+      day.forEach(subject => {
+        subject.length
+          ? row += subject.padEnd(maxSubjectNameLength + 1, ' ')
+          : row += ' '.repeat(maxSubjectNameLength + 1);
+      });
       console.log(row);
     }
   );
@@ -32,21 +36,32 @@ const formatTable = dayData => {
   await page.click('#loginButton');
   await page.goto(`${url}/next/rozvrh.aspx`);
 
-  const getSubjects = await page.evaluate(() => {
+  const getDays = await page.evaluate(() => {
     const dayRows = document.querySelectorAll('#schedule .day-row');
     const subjects = [];
+    let maxSubjectNameLength = 0;
 
     dayRows.forEach(
       day => {
         const dayItems = [];
         const subjectElements = day.querySelectorAll('.day-item');
 
+        // Finding the longest subject name
+        subjectElements.forEach(
+          element => {
+            const subjectName = element.querySelector('.middle');
+            if (subjectName && subjectName.innerHTML.length > maxSubjectNameLength) {
+              maxSubjectNameLength = subjectName.innerHTML.length;
+            }
+          }
+        );
+
         subjectElements.forEach(
           element => {
             const subjectName = element.querySelector('.middle');
             subjectName
-              ? dayItems.push(subjectName.innerText.padEnd(4, ' '))
-              : dayItems.push('    ');
+              ? dayItems.push(subjectName.innerText)
+              : dayItems.push('');
           }
         );
 
@@ -54,10 +69,14 @@ const formatTable = dayData => {
       }
     );
 
-    return subjects;
+    return {
+      data: subjects,
+      maxSubjectNameLength,
+    };
   });
 
-  formatTable(getSubjects);
+  const days = getDays;
+  formatTable(days.data, days.maxSubjectNameLength);
 
   await browser.close();
 })();
