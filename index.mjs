@@ -1,6 +1,7 @@
 import puppeteer from 'puppeteer';
 
 import { url, username, password } from './settings.mjs';
+import { updateCache } from './cache.mjs';
 
 const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá'];
 
@@ -76,6 +77,10 @@ const formatTable = (dayData, maxSubjectNameLength) => {
   });
 
   const days = getDays;
+  updateCache({
+    days,
+  });
+
   formatTable(days.data, days.maxSubjectNameLength);
 
   await browser.close();
