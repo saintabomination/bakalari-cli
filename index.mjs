@@ -1,7 +1,12 @@
 import puppeteer from 'puppeteer';
+import promptSync from 'prompt-sync';
 
 import { url, username, password } from './settings.mjs';
 import { loadCache, updateCache } from './cache.mjs';
+
+const prompt = promptSync({
+  sigint: true,
+});
 
 const dayNames = ['Po', 'Út', 'St', 'Čt', 'Pá'];
 
@@ -102,4 +107,15 @@ if (Object.keys(cacheData).length) {
   days = loadCache().days;
 }
 
-formatTable(days.data, days.maxSubjectNameLength);
+let isInputting = true;
+while (isInputting) {
+  const input = prompt('> ');
+  switch (input) {
+    case 'rozvrh':
+      formatTable(days.data, days.maxSubjectNameLength);
+      break;
+    case 'exit':
+      isInputting = false;
+      break;
+  }
+}
