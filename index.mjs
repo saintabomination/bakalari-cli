@@ -25,7 +25,7 @@ const formatTable = (dayData, maxSubjectNameLength) => {
   );
 }
 
-(async () => {
+const getData = async () => {
   const browser = await puppeteer.launch({
     headless: true,
   });
@@ -76,23 +76,30 @@ const formatTable = (dayData, maxSubjectNameLength) => {
     };
   });
 
-  const cacheData = loadCache();
   let days = {
     data: [],
     maxSubjectNameLength: 0,
   };
 
-  if (Object.keys(cacheData).length) {
-    console.log(cacheData);
-    days = cacheData.days;
-  } else {
-    days = getDays;
-    updateCache({
-      days,
-    });
-  }
-
-  formatTable(days.data, days.maxSubjectNameLength);
+  days = getDays;
+  updateCache({
+    days,
+  });
 
   await browser.close();
-})();
+};
+
+const cacheData = loadCache();
+let days = {
+  data: [],
+  maxSubjectNameLength: 0,
+};
+
+if (Object.keys(cacheData).length) {
+  days = cacheData.days;
+} else {
+  await getData();
+  days = loadCache().days;
+}
+
+formatTable(days.data, days.maxSubjectNameLength);
