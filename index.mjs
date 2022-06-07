@@ -110,12 +110,31 @@ if (Object.keys(cacheData).length) {
 let isInputting = true;
 while (isInputting) {
   const input = prompt('> ');
-  switch (input) {
+  const splitInput = input.split(' ');
+
+  switch (splitInput[0]) {
     case 'rozvrh':
       formatTable(days.data, days.maxSubjectNameLength);
       break;
+
     case 'exit':
       isInputting = false;
+      break;
+
+    case 'pocethodin':
+      if (splitInput.length < 2) {
+        console.log('Nebyla zadána žádná hodina.');
+        console.log('Nápověda: pocethodin [HODINA]');
+        break;
+      }
+
+      let totalCount = 0;
+      days.data.forEach(
+        day =>
+        totalCount += day.filter(subject => subject === splitInput[1].toUpperCase()).length
+      );
+
+      console.log(`Celkový počet hodin ${splitInput[1].toUpperCase()} v týdnu: ${totalCount}`);
       break;
   }
 }
