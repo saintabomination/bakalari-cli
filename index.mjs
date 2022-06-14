@@ -21,8 +21,8 @@ const formatTable = (dayData, maxSubjectNameLength) => {
     (day, index) => {
       let row = `${dayNames[index]} `;
       day.forEach(subject => {
-        subject.length
-          ? row += subject.padEnd(maxSubjectNameLength + 1, ' ')
+        subject.name.length
+          ? row += subject.name.padEnd(maxSubjectNameLength + 1, ' ')
           : row += ' '.repeat(maxSubjectNameLength + 1);
       });
       console.log(row);
@@ -65,9 +65,12 @@ const getData = async () => {
         subjectElements.forEach(
           element => {
             const subjectName = element.querySelector('.middle');
-            subjectName
-              ? dayItems.push(subjectName.innerText)
-              : dayItems.push('');
+            const subjectInfo = element.querySelector('.day-item-hover');
+
+            dayItems.push({
+              name: subjectName ? subjectName.innerText : '',
+              info: subjectInfo ? JSON.parse(subjectInfo.getAttribute('data-detail')) : '',
+            });
           }
         );
 
@@ -122,19 +125,36 @@ while (isInputting) {
       break;
 
     case 'pocethodin':
-      if (splitInput.length < 2) {
+      if (splitInput.length < 2 || splitInput[1] === '') {
         console.log('Nebyla zadána žádná hodina.');
         console.log('Nápověda: pocethodin [HODINA]');
         break;
       }
 
+      const selectedSubject = splitInput[1];
       let totalCount = 0;
+
       days.data.forEach(
         day =>
-        totalCount += day.filter(subject => subject === splitInput[1].toUpperCase()).length
+        totalCount += day.filter(subject => subject.name === selectedSubject.toUpperCase()).length
       );
 
       console.log(`Celkový počet hodin ${splitInput[1].toUpperCase()} v týdnu: ${totalCount}`);
+      break;
+
+    case 'ucitele':
+      if (splitInput.length < 2 || splitInput[1] === '') {
+        console.log('Tento den nebyl nalezen.');
+        console.log('Nápověda: ucitele [DEN]');
+        break;
+      }
+    
+      const selectedDay = Number(splitInput[1]);
+
+      days.data[selectedDay] && days.data[selectedDay].forEach(
+        subject =>
+        subject.info.teacher && console.log(subject.info.teacher)
+      );
       break;
   }
 }
