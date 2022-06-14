@@ -153,11 +153,22 @@ while (isInputting) {
         break;
       }
     
-      const selectedDay = Number(splitInput[1]);
+      const selectedDay = Number(splitInput[1] - 1);
+      let filteredTeachers = [];
 
-      days.data[selectedDay] && days.data[selectedDay].forEach(
-        subject =>
-        subject.info.teacher && console.log(subject.info.teacher)
+      if (days.data[selectedDay]) {
+        days.data[selectedDay].forEach(
+          subject => {
+            if (!filteredTeachers.includes(subject.info.teacher)) {
+              filteredTeachers.push(subject.info.teacher);
+            }
+          }
+        );
+      }
+
+      filteredTeachers.forEach(
+        teacher =>
+        teacher && console.log(teacher)
       );
       break;
   }
