@@ -24,3 +24,7 @@ export const updateCache = newData => {
     if (err) console.log(err);
   });
 }
+
+export const deleteCache = () => {
+  if (fs.existsSync(dataDir)) fs.rm(dataDir, { recursive: true });
+}

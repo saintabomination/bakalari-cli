@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer';
 import promptSync from 'prompt-sync';
 
 import { url, username, password } from './settings.mjs';
-import { loadCache, updateCache } from './cache.mjs';
+import { loadCache, updateCache, deleteCache } from './cache.mjs';
 
 const prompt = promptSync({
   sigint: true,
@@ -116,6 +116,10 @@ while (isInputting) {
   const splitInput = input.split(' ');
 
   switch (splitInput[0]) {
+    case 'rmcache':
+      deleteCache();
+      break;
+
     case 'rozvrh':
       formatTable(days.data, days.maxSubjectNameLength);
       break;
