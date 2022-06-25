@@ -120,6 +120,10 @@ while (isInputting) {
       deleteCache();
       break;
 
+    case 'remote':
+      console.log(`URL: ${url}/`);
+      break;
+
     case 'rozvrh':
       formatTable(days.data, days.maxSubjectNameLength);
       break;
