@@ -90,7 +90,11 @@ const getData = async () => {
   };
 
   days = getDays;
+  const time = new Date();
+  const lastUpdated = time.toLocaleString('cs-CZ');
+
   updateCache({
+    lastUpdated: lastUpdated,
     days,
   });
 
@@ -122,6 +126,9 @@ while (isInputting) {
 
     case 'remote':
       console.log(`URL: ${url}/`);
+      if (Object.keys(cacheData).length) {
+        console.log(`Last updated: ${cacheData.lastUpdated}`);
+      }
       break;
 
     case 'rozvrh':
