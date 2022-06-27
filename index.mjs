@@ -35,13 +35,17 @@ const getData = async () => {
     headless: true,
   });
   const page = await browser.newPage();
+  const startTime = new Date();
 
+  console.log('Logging in...');
   await page.goto(`${url}/login`);
   await page.type('#username', username);
   await page.type('#password', password);
   await page.click('#loginButton');
   await page.goto(`${url}/next/rozvrh.aspx`);
+  console.log('Logged in.');
 
+  console.log('Fetching the timetable...');
   const getDays = await page.evaluate(() => {
     const dayRows = document.querySelectorAll('#schedule .day-row');
     const subjects = [];
@@ -84,6 +88,12 @@ const getData = async () => {
     };
   });
 
+  const endTime = new Date();
+  let timeDifference = endTime - startTime;
+  timeDifference /= 1000;
+
+  console.log(`The data has been fetched in ${timeDifference} seconds.`);
+
   let days = {
     data: [],
     maxSubjectNameLength: 0,
@@ -101,7 +111,7 @@ const getData = async () => {
   await browser.close();
 };
 
-const cacheData = loadCache();
+let cacheData = loadCache();
 let days = {
   data: [],
   maxSubjectNameLength: 0,
@@ -111,7 +121,8 @@ if (Object.keys(cacheData).length) {
   days = cacheData.days;
 } else {
   await getData();
-  days = loadCache().days;
+  cacheData = loadCache();
+  days = cacheData.days;
 }
 
 let isInputting = true;
